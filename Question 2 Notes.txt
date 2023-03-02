@@ -1,0 +1,9 @@
+IV (x variable): recommendation mode/ type (auditory vs visual) between groups (2 groups)
+   stimulus (credit card, beer, restaurant, extension cord) within groups/ repeated measures (everyone got 1 of each type of stimulus) 
+
+DV: recommendation follow yes(1) no(0) all ps have either yes or no
+    composite intellect (of competent, intelligent & thoughtful) all ps have one 
+
+no. of ps: 1572
+no. of trials: 4 
+thus 1572 / 4 = 393 data sets 
