@@ -35,6 +35,14 @@ d2 <- read.csv("faces.csv")
 summary(d2)
 str(d2)
 
+my_prin_comps <- prcomp(~ attractive + caring + aggressive + mean + intelligent + confident + emotionally.stable + trustworthy + responsible + sociable + weird + unhappy + dominant + threatening , d2)
+summary(my_prin_comps)
+
+install.packages('factoextra')
+library(factoextra)
+
+factoextra::fviz_eig(my_prin_comps)
+
 #Part 3.2 - Testing two factor model on ′faces_big.csv′
 d3 <- read.csv("faces_big.csv") 
 summary(d3)
