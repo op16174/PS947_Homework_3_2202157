@@ -8,7 +8,7 @@ options(scipen = 5, digits = 3)
 #set working directory
 setwd("~/GitHub/PS947---Homework-3---2202157")
 
-#download, instal and load lme
+#download, install and load lme
 install.packages('lme4')
 library(lme4)
 
@@ -48,11 +48,11 @@ d2 <- read.csv("faces.csv")
 summary(d2)
 str(d2)
 
-#conduct PCA
+### conduct PCA
 q2pca <- prcomp(~ attractive + caring + aggressive + mean + intelligent + confident + emotionally.stable + trustworthy + responsible + sociable + weird + unhappy + dominant + threatening , d2, scale = TRUE)
 summary(q2pca)
 
-#instal and load factoextra
+### instal and load factoextra
 install.packages('factoextra')
 library(factoextra)
 

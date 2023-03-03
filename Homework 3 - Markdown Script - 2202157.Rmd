@@ -9,43 +9,141 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+# R Markdown
 
-Today's homework notes
-
-# Big
-
-## Medium 
-
-### Small
-
-- Point 1 
-- Point 2 
-- Point 3 
-
-*itallic*
-**bold** 
-
-```{r}
-#code here
-```
-
+# Setup
+### load tidyverse
 ```{r}
 library(tidyverse)
 ```
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+### set options and scipen
+```{r}
+options(scipen = 5, digits = 3)
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+### set working directory
+```{r}
+setwd("~/GitHub/PS947---Homework-3---2202157")
 ```
+
+### load lme4
+```{r}
+library(lme4)
+```
+
+# QUESTION 1
+Have created a repository on GitHub entitled PS947_Homework_3_2202157
+Have added scienceanna as a collaborator. 
+
+# QUESTION 2 - RECOMMENDATIONS ON CHOICE
+
+### import data and summarise
+```{r}
+d <- read.csv("recommendations.csv", row.names = 1) 
+summary(d)
+```
+
+## Part 2.1 - Fit a model and justify
+```{r}
+m <- glmer(data = d,
+         RecommendationFollowed ~ Mode + (1 | ResponseID),
+         family = binomial(link = "logit"));summary(m)
+```
+
+### JUSTIFICATION: General linear mixed effects model was used because looking at the relationship between two variables (e.g. how Mode predicts RecommendationFollowed). Both variables are binomial e.g. Mode is either visual or auditory and RecommendationFollowed as 1 = YES and 0 = NO hence the use of the binomial link function. Mixed effects model used as cannot assume each observation in our data frame is truly independent as repeated measures design was used for the stimulus where each participant did of the four stimuli. 
+
+## Part 2.2 - Use model/ plots qualitatively assess evidence for recommendation mode affecting choice
+### Make a graph
+```{r}
+d %>%
+  ggplot(aes(x = RecommendationFollowed, y = Stimulus, fill = factor(Mode))) +
+  geom_bar(stat="identity", position="dodge")+
+  xlab("Recommendation")+ylab("Stimulus")+
+  theme(legend.position = "top")+
+  labs(fill = "ResponseID")
+```
+#### attempted a graph, not working, had to give-up
+
+
+# QUESTION 3 - SOCIAL JUDGEMENTS OF FACES
+## Part 3.1 - Replicate PCA from Oosterhof and Todorov (2008)
+
+### read data file and summarise the data
+```{r}
+d2 <- read.csv("faces.csv") 
+summary(d2)
+```
+
+### conduct PCA
+```{r}
+q2pca <- prcomp(~ attractive + caring + aggressive + mean + intelligent + confident + emotionally.stable + trustworthy + responsible + sociable + weird + unhappy + dominant + threatening , d2, scale = TRUE)
+summary(q2pca)
+```
+
+### load factoextra
+```{r}
+library(factoextra)
+```
+
+### create scree plot
+```{r}
+factoextra::fviz_eig(q2pca)
+```
+
+### CONCLUSION Oosterhof and Todorov (2008) found that their first two principal components accounted for more than 80% of the variance with their first principal component accounting for more than 60% of the variance. My PCA revealed that that the cumulative proportion of variance explained by the the first two principal components was 81.8% with the first principle component accounting for 62.8% of the variance. Thus my PCA replicated the PCA results found by Oosterhof and Todoro (2008).
+
+## Part 3.2 - Testing two factor model on ′faces_big.csv′
+```{r}
+d3 <- read.csv("faces_big.csv") 
+summary(d3)
+```
+
+### load lavaan
+```{r}
+library(lavaan)
+```
+
+### Define the latent factors for valence and dominance
+```{r}
+sjofcomponents <- 'valence =~ trustworthy + caring + responsible + sociable
+dominance =~ dominant + confident + aggressive + mean'
+```
+
+## Part 3.3 - Run model, Conclusions about hypothesis
+```{r}
+model_field <- cfa(sjofcomponents, d3)
+summary(model_field)
+```
+
+### install and load tidySEM
+```{r}
+library(tidySEM)
+```
+
+### visualise the model
+```{r}
+graph_sem(model_field,
+          layout = get_layout("", "valence", "", "", "dominance", "",
+                              "trustworthy" , "caring" , "responsible" , "sociable", "dominant" , "confident", "aggressive" , "mean",
+                              rows = 2))
+```
+
+### model fit
+```{r}
+summary(model_field, fit.measures = TRUE)
+```
+
+### To pass RMSEA < 0.07
+```{r}
+fitMeasures(model_field) ["rmsea"]
+```
+### CONCLUSION: RMSEA = 0.593 thus RMSEA not < 0.07 thus model does not account well for the data
+
+### To pass CFI >= 0.9
+```{r}
+fitMeasures(model_field) ["cfi"]
+```
+### CONCLUSION: CFI = 0.558 thus CFI not >= 0.9 thus model does not account well for the data
+
+### CONLUSION: Based on these measures, it seems like Dr Hughes' hypothesis (that 'trustworthy', 'caring', 'responsible' and 'sociable' should load onto the 'valence' factor, and 'dominant', 'confident', 'aggressive' and 'mean' should load onto the 'dominance' factor) is not supported by the data.
