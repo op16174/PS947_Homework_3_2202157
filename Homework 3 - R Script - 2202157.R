@@ -14,20 +14,31 @@ library(lme4)
 
 #QUESTION 2 - RECOMMENDATIONS ON CHOICE DATA
 #import data and summarise
-d <- read.csv("recommendations.csv") 
+d <- read.csv("recommendations.csv", row.names = 1) 
 summary(d)
 str(d)
 
 #Part 2.1 - Fit a model to analyses how recommendation mode affects whether a recommendation is followed, describe analyses choices and justify why you picked them
 #How IV (recommendation mode, auditory vs visual) affects DV (recommendation followed 1=yes, 0=no)
 
+m <- glmer(data = d,
+         RecommendationFollowed ~ Mode + (1 | ResponseID),
+         family = binomial(link = "logit"));summary(m)
+#JUSTIFICATION: General linear mixed effects model was used because looking at the relationship between two variables (e.g. how Mode predicts RecommendationFollowed). Both variables are binomial e.g. Mode is either visual or auditory and RecommendationFollowed as 1 = YES and 0 = NO hence the use of the binomial link function. Mixed effects model used as cannot assume each observation in our data frame is truly independent as repeated measures design was used for the stimulus where each participant did of the four stimuli. 
 
 #Part 2.2 - Use model/ plots qualitatively assess evidence for recommendation mode affecting choice
 
-#Part 2.3 - Distinction material: The authors of the study wondered whether one explanation for the results could be that participants perceive recommendations in one modality as being more competent, intelligent and/or thoughtful than in the other. Can you find any evidence for this? Does it affect your conclusions about the effect of modality?
-d$Stimulus <- factor(d$Stimulus)
+d %>%
+  ggplot(aes(x = RecommendationFollowed, y = Stimulus, fill = factor(Mode))) +
+  geom_bar(stat="identity", position="dodge")+
+  xlab("Recommendation")+ylab("Stimulus")+
+  theme(legend.position = "top")+
+  labs(fill = "ResponseID")
+#attempted a graph, not working, give-up
 
-#no clue about how to start Q2 skip 
+#Part 2.3 - Distinction material: The authors of the study wondered whether one explanation for the results could be that participants perceive recommendations in one modality as being more competent, intelligent and/or thoughtful than in the other. Can you find any evidence for this? Does it affect your conclusions about the effect of modality?
+#no clue skip
+
 
 #QUESTION 3 - SOCIAL JUDGEMENTS OF FACES
 #Part 3.1 - Replicate PCA using ′faces.csv′.

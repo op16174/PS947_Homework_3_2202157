@@ -7,3 +7,6 @@ DV: recommendation follow yes(1) no(0) all ps have either yes or no
 no. of ps: 1572
 no. of trials: 4 
 thus 1572 / 4 = 393 data sets 
+
+#How IV (recommendation mode, auditory vs visual) affects DV (recommendation followed 1=yes, 0=no)
+link function: binomial? 
