@@ -31,21 +31,62 @@ d$Stimulus <- factor(d$Stimulus)
 
 #QUESTION 3 - SOCIAL JUDGEMENTS OF FACES
 #Part 3.1 - Replicate PCA using ′faces.csv′.
+
+#read data file and summarise the data
 d2 <- read.csv("faces.csv") 
 summary(d2)
 str(d2)
 
-my_prin_comps <- prcomp(~ attractive + caring + aggressive + mean + intelligent + confident + emotionally.stable + trustworthy + responsible + sociable + weird + unhappy + dominant + threatening , d2)
-summary(my_prin_comps)
+#conduct PCA
+q2pca <- prcomp(~ attractive + caring + aggressive + mean + intelligent + confident + emotionally.stable + trustworthy + responsible + sociable + weird + unhappy + dominant + threatening , d2, scale = TRUE)
+summary(q2pca)
 
+#instal and load factoextra
 install.packages('factoextra')
 library(factoextra)
 
-factoextra::fviz_eig(my_prin_comps)
+#create scree plot
+factoextra::fviz_eig(q2pca)
+
+#CONCLUSION Oosterhof and Todorov (2008) found that their first two principal components accounted for more than 80% of the variance with their first principal component accounting for more than 60% of the variance. My PCA revealed that that the cumulative proportion of variance explained by the the first two principal components was 81.8% with the first principle component accounting for 62.8% of the variance. Thus my PCA replicated the PCA results found by Oosterhof and Todoro (2008).
 
 #Part 3.2 - Testing two factor model on ′faces_big.csv′
 d3 <- read.csv("faces_big.csv") 
 summary(d3)
 str(d3)
 
+#install and load lavaan
+install.packages('lavaan')
+library(lavaan)
+
+#Define the latent factors for valence and dominance
+sjofcomponents <- 'valence =~ trustworthy + caring + responsible + sociable
+dominance =~ dominant + confident + aggressive + mean'
+
 #Part 3.3 - Run model, Conclusions about hypothesis
+model_field <- cfa(sjofcomponents, d3)
+summary(model_field)
+
+#install and load tidySEM
+install.packages('tidySEM')
+library(tidySEM)
+
+#visualise the model
+library(tidySEM)
+graph_sem(model_field,
+          layout = get_layout("", "valence", "", "", "dominance", "",
+                              "trustworthy" , "caring" , "responsible" , "sociable", "dominant" , "confident", "aggressive" , "mean",
+                              rows = 2))
+
+#model fit
+summary(model_field, fit.measures = TRUE)
+
+#To pass RMSEA < 0.07
+fitMeasures(model_field) ["rmsea"]
+#CONCLUSION: RMSEA = 0.593 thus RMSEA not < 0.07 thus model does not account well for the data
+
+#To pass CFI >= 0.9
+fitMeasures(model_field) ["cfi"]
+#CONCLUSION: CFI = 0.558 thus CFI not >= 0.9 thus model does not account well for the data
+
+#CONLUSION: Based on these measures, it seems like Dr Hughes' hypothesis (that 'trustworthy', 'caring', 'responsible' and 'sociable' should load onto the 'valence' factor, and 'dominant', 'confident', 'aggressive' and 'mean' should load onto the 'dominance' factor) is not supported by the data. 
